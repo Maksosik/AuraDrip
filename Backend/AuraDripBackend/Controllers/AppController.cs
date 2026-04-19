@@ -149,8 +149,32 @@ namespace AuraDripBackend.Controllers
         [HttpGet("test-error")] // Маршрут: /api/app/test-error
         public IActionResult TestError()
         {
+            // Крок 3.1: Додаємо контекст користувача перед помилкою
+            SentrySdk.ConfigureScope(scope =>
+            {
+                scope.User = new SentryUser
+                {
+                    Id = "maksym_admin_01",
+                    Email = "maksym@auradrip.local",
+                    Username = "Maksym"
+                };
+            });
+
             // Навмисно генеруємо критичну помилку
             throw new Exception("Sentry Backend Test Error: Упс, сервер зламався!");
+        }
+
+        [HttpPost("logout")] // Маршрут: /api/app/logout
+        public IActionResult Logout()
+        {
+            // Крок 3.3: Очищення контексту користувача
+            SentrySdk.ConfigureScope(scope =>
+            {
+                // Замість null безпечніше передати порожній об'єкт SentryUser
+                scope.User = new SentryUser();
+            });
+
+            return Ok(new { message = "Успішний вихід. Контекст Sentry очищено." });
         }
     }
 }

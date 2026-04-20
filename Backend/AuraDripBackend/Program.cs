@@ -98,9 +98,35 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Тестове посилання (без контролера!), щоб глянути, чи завантажились рослини в базу
-app.MapGet("/api/check-catalog", (AuraDripBackend.Data.AppDbContext db) => {
-    return db.PlantCatalogs.ToList();
+// Тестове посилання з підтримкою Feature Flags (Лабораторна 5, Крок 5)
+app.MapGet("/api/check-catalog", async (AuraDripBackend.Data.AppDbContext db, IPostHogClient ph) =>
+{
+    // 1. Перевіряємо статус прапорця у PostHog для користувача "server_admin"
+    // Назви прапорець у панелі PostHog як 'show-my-plants'
+    var isExtendedEnabled = await ph.IsFeatureEnabledAsync("show-my-plants", "server_admin");
+
+    // 2. Отримуємо основний каталог
+    var catalog = await db.PlantCatalogs.ToListAsync();
+
+    // 3. Якщо прапорець увімкнено — додаємо особисті рослини користувача
+    if (isExtendedEnabled)
+    {
+        var myPlants = await db.Plants.ToListAsync();
+
+        return Results.Ok(new
+        {
+            Message = "Feature Flag 'show-my-plants' активний! Отримано розширені дані.",
+            Catalog = catalog,
+            MyCurrentPlants = myPlants // Ті самі "додаткові рослини, що наявні в нього"
+        });
+    }
+
+    // 4. Якщо прапорець вимкнено — повертаємо лише стандартний каталог
+    return Results.Ok(new
+    {
+        Message = "Стандартний режим. Feature Flag вимкнено.",
+        Catalog = catalog
+    });
 });
 
 var posthog = app.Services.GetRequiredService<IPostHogClient>();

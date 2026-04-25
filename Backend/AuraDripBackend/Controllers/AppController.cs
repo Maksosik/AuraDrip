@@ -31,6 +31,7 @@ namespace AuraDripBackend.Controllers
                 return NotFound(new { message = "Plant not found" });
             }
 
+            //найсвіжіший запис, який прислала ESP32
             var LastTelemetry = await _context.Telemetries.Where(t => t.PlantId == plantId).OrderByDescending(t => t.Timestamp).FirstOrDefaultAsync();
 
             return Ok(new
@@ -38,6 +39,7 @@ namespace AuraDripBackend.Controllers
                 AgeDays = (DateTime.UtcNow - plant.DatePlanted).Days,
                 CurrentMoisture = LastTelemetry?.SoilMoisture ?? 0,
                 CurrentTemp = LastTelemetry?.AirTemperature ?? 0,
+                CurrentAirHum = LastTelemetry?.AirHumidity ?? 0,
                 LastUpdate = LastTelemetry?.Timestamp
             });
         }
@@ -54,11 +56,16 @@ namespace AuraDripBackend.Controllers
             }
             // Оновлюємо режим (Авто/Ручний/Фікс. поріг)
             plant.ControlMode = config.ControlMode;
-            // Якщо користувач вибрав 3-й режим(Фікс. поріг):
+            // Якщо користувач вибрав 3-й режим (Полив за порогом):
             if (config.ControlMode == 3 && config.ManualThreshold.HasValue)
             {
+                // Ми зберігаємо в базу число, наприклад "30" (%)
                 plant.MinMoistureThreshold = config.ManualThreshold.Value;
             }
+
+            // Ми просто зберегли ControlMode = 2, і тепер ESP32 буде знати, 
+            // що автоматично поливати не треба.
+            //1-розумний не реалізовна 
 
             // Зберегаємо зміни в базі 
             await _context.SaveChangesAsync();

@@ -31,6 +31,7 @@ namespace AuraDripBackend.Controllers
                 return NotFound(new { message = "Plant not found" });
             }
 
+            //найсвіжіший запис, який прислала ESP32
             var LastTelemetry = await _context.Telemetries.Where(t => t.PlantId == plantId).OrderByDescending(t => t.Timestamp).FirstOrDefaultAsync();
 
             return Ok(new
@@ -38,6 +39,7 @@ namespace AuraDripBackend.Controllers
                 AgeDays = (DateTime.UtcNow - plant.DatePlanted).Days,
                 CurrentMoisture = LastTelemetry?.SoilMoisture ?? 0,
                 CurrentTemp = LastTelemetry?.AirTemperature ?? 0,
+                CurrentAirHum = LastTelemetry?.AirHumidity ?? 0,
                 LastUpdate = LastTelemetry?.Timestamp
             });
         }

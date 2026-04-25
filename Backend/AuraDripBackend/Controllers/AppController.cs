@@ -44,6 +44,28 @@ namespace AuraDripBackend.Controllers
             });
         }
 
+        [HttpGet("plants/{plantId}/config")] // /api/app/plants/{plantId}/config
+        public async Task<IActionResult> GetConfig(int plantId)
+        {
+            // Шукаємо рослину
+            var plant = await _context.Plants.FindAsync(plantId);
+
+            if (plant == null)
+            {
+                return NotFound(new { message = "Plant not found" });
+            }
+
+            // Повертаємо тільки те, що стосується налаштувань
+            return Ok(new
+            {
+                PlantId = plant.Id,
+                PlantName = plant.Name,
+                ControlMode = plant.ControlMode, // 1, 2 або 3
+                MinMoistureThreshold = plant.MinMoistureThreshold, // Для режиму 2
+                HasPendingCommand = plant.HasPendingWaterCommand // Чи світиться зараз "запит" на полив
+            });
+        }
+
         [HttpPatch("plants/{plantId}/config")] // /api/app/plants/{plantId}/config
         public async Task<IActionResult> UpdateConfig(int plantId, [FromBody] UpdateConfigDto config)
         {

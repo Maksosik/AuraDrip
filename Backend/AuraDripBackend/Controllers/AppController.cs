@@ -120,7 +120,7 @@ namespace AuraDripBackend.Controllers
             }
 
             // Поклав "записку" в поштову скриньку(полити при нагоді)
-            plant.HasPendingWaterCommand = true;
+            plant.HasPendingWaterCommand = false; // Помилка для 5 завдання
 
             await _context.SaveChangesAsync();
 

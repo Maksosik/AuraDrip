@@ -16,5 +16,47 @@
     "Description": "Тропічна рослина. Потребує постійної вологості та обприскування.",
     "DefaultMoistureThreshold": 45,
     "ImageUrl": "ficus.png"
+  },
+  {
+    "SpeciesName": "Спатіфілум (Жіноче щастя)",
+    "Description": "Тіньовитривала рослина, яка любить рясний полив і високу вологість повітря.",
+    "DefaultMoistureThreshold": 60,
+    "ImageUrl": "spathiphyllum.png"
+  },
+  {
+    "SpeciesName": "Сансев'єрія (Тещин язик)",
+    "Description": "Надзвичайно стійка рослина. Переносить тінь і тривалу посуху.",
+    "DefaultMoistureThreshold": 20,
+    "ImageUrl": "sansevieria.png"
+  },
+  {
+    "SpeciesName": "Монстера",
+    "Description": "Велика тропічна ліана. Потребує регулярного поливу та протирання листя.",
+    "DefaultMoistureThreshold": 50,
+    "ImageUrl": "monstera.png"
+  },
+  {
+    "SpeciesName": "Алое Віра",
+    "Description": "Лікарський сукулент. Потребує яскравого світла і рідкого поливу.",
+    "DefaultMoistureThreshold": 15,
+    "ImageUrl": "aloe.png"
+  },
+  {
+    "SpeciesName": "Заміокулькас (Доларове дерево)",
+    "Description": "Невибаглива рослина. Накопичує воду в бульбах, тому поливати треба рідко.",
+    "DefaultMoistureThreshold": 25,
+    "ImageUrl": "zamioculcas.png"
+  },
+  {
+    "SpeciesName": "Орхідея Фаленопсис",
+    "Description": "Екзотична квітка. Любить розсіяне світло і специфічний полив зануренням.",
+    "DefaultMoistureThreshold": 40,
+    "ImageUrl": "orchid.png"
+  },
+  {
+    "SpeciesName": "Драцена",
+    "Description": "Кімнатна пальма. Полюбляє помірний полив і часте обприскування.",
+    "DefaultMoistureThreshold": 35,
+    "ImageUrl": "dracaena.png"
   }
 ]

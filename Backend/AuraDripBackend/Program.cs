@@ -31,8 +31,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+/*builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));*/
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseInMemoryDatabase("LabDB"));
 
 // 1. Читаємо налаштування з appsettings.json
 var postHogKey = builder.Configuration["PostHog:ApiKey"] ?? "dummy_key_for_tests";
@@ -75,7 +78,7 @@ using (var scope = app.Services.CreateScope())
     // Перевіряємо, чи БД підтримує міграції(справжня БД, а не InMemory для тестів)
     if (context.Database.IsRelational())
     {
-        context.Database.Migrate();
+        //context.Database.Migrate();
     }
 
     // 1. Формуємо шлях до файлу

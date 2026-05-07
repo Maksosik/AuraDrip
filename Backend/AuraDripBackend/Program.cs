@@ -96,6 +96,61 @@ using (var scope = app.Services.CreateScope())
             Console.WriteLine("Plant catalog successfully loaded from JSON!");
         }
     }
+
+    // Перевіряємо, чи існує взагалі рослина з Id = 1
+    var testPlant = context.Plants.FirstOrDefault(p => p.Id == 1);
+
+    if (testPlant != null)
+    {
+        // Перевіряємо, чи порожня телеметрія для цієї рослини
+        bool hasTelemetry = context.Telemetries.Any(t => t.PlantId == 1);
+
+        if (!hasTelemetry)
+        {
+            var telemetries = new List<AuraDripBackend.Models.Telemetry>();
+            var random = new Random();
+
+            // Починаємо генерувати дані з моменту "14 днів тому"
+            var startDate = DateTime.UtcNow.AddDays(-14);
+
+            int currentMoisture = 85; // Початкова вологість (щойно полили)
+
+            // Генеруємо дані кожні 4 години (6 записів на день * 14 днів = 84 записи)
+            for (int i = 0; i <= 14 * 6; i++)
+            {
+                var recordDate = startDate.AddHours(i * 4);
+
+                // Імітуємо висихання ґрунту: кожні 4 години вологість падає на 2-5%
+                currentMoisture -= random.Next(2, 6);
+
+                // Якщо ґрунт висох (впав нижче 25%) - імітуємо полив
+                if (currentMoisture <= 25)
+                {
+                    currentMoisture = random.Next(80, 95); // Різкий скачок вологості
+                }
+
+                telemetries.Add(new AuraDripBackend.Models.Telemetry
+                {
+                    PlantId = 1,
+                    Timestamp = recordDate,
+                    SoilMoisture = currentMoisture,
+                    // Температура кімнатна: від 20.0 до 24.9
+                    AirTemperature = 20.0 + random.NextDouble() * 5.0,
+                    // Вологість повітря: від 40% до 60%
+                    AirHumidity = 40.0 + random.NextDouble() * 20.0
+                });
+            }
+
+            // Зберігаємо згенеровані дані в базу
+            context.Telemetries.AddRange(telemetries);
+            context.SaveChanges();
+            Console.WriteLine("Успішно згенеровано 2 тижні тестової телеметрії для рослини #1!");
+        }
+    }
+    else
+    {
+        Console.WriteLine("Рослина з Id = 1 не знайдена. Телеметрія не згенерована. Створіть рослину спочатку.");
+    }
 }
 
 // Тестове посилання з підтримкою Feature Flags (Лабораторна 5, Крок 5)

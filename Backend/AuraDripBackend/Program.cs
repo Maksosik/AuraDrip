@@ -1,9 +1,15 @@
 using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 
 using AuraDripBackend.Data;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 using PostHog;
 
@@ -97,6 +103,7 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
+    /* ==== ТИМЧАСОВО ВІДКЛЮЧЕНО ГЕНЕРАЦІЮ ТЕЛЕМЕТРІЇ ====
     // Перевіряємо, чи існує взагалі рослина з Id = 1
     var testPlant = context.Plants.FirstOrDefault(p => p.Id == 1);
 
@@ -151,6 +158,7 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine("Рослина з Id = 1 не знайдена. Телеметрія не згенерована. Створіть рослину спочатку.");
     }
+    ==== КІНЕЦЬ ЗАКРИТОГО БЛОКУ ==== */
 }
 
 // Тестове посилання з підтримкою Feature Flags (Лабораторна 5, Крок 5)

@@ -134,35 +134,51 @@ namespace AuraDripBackend.Controllers
             return Ok(new { message = "The forced irrigation command has been successfully added to the queue!" });
         }
 
-        [HttpGet("plants/{plantId}/statistics")]// /api/app/plants/{plantId}/statistics
-        public async Task<IActionResult> GetStatistics(int plantId, [FromQuery] int days = 14)
+        [HttpGet("plants/{plantId}/history")]
+        public async Task<IActionResult> GetPlantHistory(int plantId, [FromQuery] int days = 14)
         {
-            // 1. Визначаємо дату початку (віднімаємо потрібну кількість днів від "зараз")
             var startDate = DateTime.UtcNow.AddDays(-days);
 
-            // 2. Дістаємо всі записи для цієї рослини, які новіші за startDate
-            // Використовуємо ToListAsync(), бо нам потрібні всі записи за період!
+            // Отримуємо дані, сортуємо від старіших до новіших для коректного графіка
             var data = await _context.Telemetries
                 .Where(t => t.PlantId == plantId && t.Timestamp >= startDate)
+                .OrderBy(t => t.Timestamp)
                 .ToListAsync();
 
-            // Перевірка: якщо за цей період ще немає жодних записів
             if (!data.Any())
             {
-                return Ok(new { message = "No data" });
+                return Ok(new
+                {
+                    Message = "No data",
+                    PeriodDays = days,
+                    History = new List<object>(),
+                    Statistics = new { }
+                });
             }
 
-            // 3.Використав LINQ, щоб порахувати середнє значення для SoilMoisture та AirTemperature.
+            // Рахуємо агреговані дані прямо тут
             var avgMoisture = data.Average(t => t.SoilMoisture);
             var avgTemp = data.Average(t => t.AirTemperature);
+            var avgHumidity = data.Average(t => t.AirHumidity);
 
-            // Повертаємо звіт
             return Ok(new
             {
                 PeriodDays = days,
-                TotalRecords = data.Count, // Покажемо, скільки разів ESP виходила на зв'язок
-                AverageMoisture = Math.Round(avgMoisture, 1), // Округлюємо до 1 знака після коми
-                AverageTemperature = Math.Round(avgTemp, 1)
+                TotalRecords = data.Count,
+                // Секція зі статистикою (для карток в додатку)
+                Statistics = new
+                {
+                    AverageMoisture = Math.Round(avgMoisture, 1),
+                    AverageTemperature = Math.Round(avgTemp, 1),
+                    AverageAirHumidity = Math.Round(avgHumidity, 1)
+                },
+                // Секція з повними даними (для побудови графіка)
+                History = data.Select(t => new {
+                    t.Timestamp,
+                    t.SoilMoisture,
+                    t.AirTemperature,
+                    t.AirHumidity
+                })
             });
         }
         //контролер для перевірки статусу проекту
